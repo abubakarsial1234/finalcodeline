@@ -4,7 +4,8 @@ phases:
   pre_build:
     commands:
       - echo Logging in to Amazon ECR...
-      # AWS_ACCOUNT_ID aur AWS_DEFAULT_REGION environment variables CodeBuild mein pehle se hote hain
+      # AWS_ACCOUNT_ID pehle se set nahi hota. Hum ise AWS STS se haasil karenge.
+      - export AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
       - REPOSITORY_URI=$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/my-frontend-app
       # CODEBUILD_RESOLVED_SOURCE_VERSION se hum commit hash lete hain, taake har image unique ho
@@ -30,3 +31,4 @@ phases:
 artifacts:
   files:
     - imagedefinitions.json
+
